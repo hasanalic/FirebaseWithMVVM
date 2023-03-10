@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import com.example.firebasewithmvvm.R
 import com.example.firebasewithmvvm.databinding.FragmentNoteListingBinding
 import com.example.firebasewithmvvm.model.Note
+import com.example.firebasewithmvvm.util.UiState
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,10 +42,20 @@ class NoteListingFragment : Fragment() {
         }
     }
 
-    fun setViews(list: List<Note>) {
-        binding.id.text = list[0].id
-        binding.text.text = list[0].text
-        binding.date.text = list[0].date.toString()
+    fun setViews(state: UiState<List<Note>>) {
+        when(state){
+            is UiState.Loading -> {
+                println("loading")
+            }
+            is UiState.Success -> {
+                state.data.forEach{
+
+                }
+            }
+            is UiState.Failure -> {
+                println(state.error)
+            }
+        }
     }
 
     override fun onDestroyView() {

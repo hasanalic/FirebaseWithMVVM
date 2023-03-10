@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.firebasewithmvvm.model.Note
 import com.example.firebasewithmvvm.repository.NoteRepository
+import com.example.firebasewithmvvm.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -13,12 +14,26 @@ class NoteViewModel @Inject constructor(
     val repository: NoteRepository
 ): ViewModel() {
 
-    private val _notes = MutableLiveData<List<Note>>()
-    val notes: LiveData<List<Note>>
+    private val _notes = MutableLiveData<UiState<List<Note>>>()
+    val notes: LiveData<UiState<List<Note>>>
         get() = _notes
 
+    private val _addNote = MutableLiveData<UiState<String>>()
+    val addNote: LiveData<UiState<String>>
+        get() = _addNote
+
     fun getNotes() {
-        // repository'deki "getNotes" fonksiyonu bize List<Note> döndürür
-        _notes.value = repository.getNotes()
+        _notes.value = UiState.Loading
+
+        repository.getNotes {
+            _notes.value = it
+        }
+    }
+
+    fun addNote(note: Note) {
+        _addNote.value = UiState.Loading
+        repository.addNote(note) {
+            _addNote.value = it
+        }
     }
 }
