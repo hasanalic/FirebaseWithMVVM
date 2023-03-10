@@ -26,4 +26,6 @@ class NoteDetailFragment : Fragment() {
         _binding = null
     }
 
+    //test
+
 }
