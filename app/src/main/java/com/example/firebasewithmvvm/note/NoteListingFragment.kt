@@ -9,7 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import com.example.firebasewithmvvm.R
 import com.example.firebasewithmvvm.databinding.FragmentNoteListingBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class NoteListingFragment : Fragment() {
 
     private var _binding: FragmentNoteListingBinding? = null
