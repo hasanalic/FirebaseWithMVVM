@@ -27,10 +27,16 @@ class NoteListingFragment : Fragment() {
     val adapter by lazy {
         NoteListingAdapter(
             onItemClicked = { pos, item ->
-
+                findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment,Bundle().apply {
+                    putString("type","view")
+                    putParcelable("note",item)
+                })
             },
             onEditClicked = { pos, item ->
-
+                findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment,Bundle().apply {
+                    putString("type","edit")
+                    putParcelable("note",item)
+                })
             },
             onDeleteClicked = { pos, item ->
 
@@ -53,7 +59,9 @@ class NoteListingFragment : Fragment() {
 
         // not ekleme ekranına gitme
         binding.button.setOnClickListener {
-            findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment)
+            findNavController().navigate(R.id.action_noteListingFragment_to_noteDetailFragment,Bundle().apply {
+                putString("type","create")
+            })
         }
 
         // önce viewmodel'daki "repo'dan verileri çeken fonksiyon" çalıştırılır.
