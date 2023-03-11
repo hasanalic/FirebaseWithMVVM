@@ -24,6 +24,8 @@ class NoteListingFragment : Fragment() {
     private var _binding: FragmentNoteListingBinding? = null
     private val binding get() = _binding!!
     val viewModel: NoteViewModel by viewModels()
+    var deletePosition: Int = -1
+    var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
         NoteListingAdapter(
             onItemClicked = { pos, item ->
@@ -39,7 +41,8 @@ class NoteListingFragment : Fragment() {
                 })
             },
             onDeleteClicked = { pos, item ->
-
+                deletePosition = pos
+                viewModel.deleteNote(item)
             }
         )
     }
@@ -69,26 +72,43 @@ class NoteListingFragment : Fragment() {
 
         // viewmodel'daki getNotes() fonksiyonu, verileri yine viewmodel'daki _notes'a aktarır.
         // biz de "notes" liveData'sını observe ederek verinin durumunu takip ederiz.
-        viewModel.notes.observe(viewLifecycleOwner){
-            setViews(it)
+        viewModel.notes.observe(viewLifecycleOwner){ state ->
+            when(state){
+                is UiState.Loading -> {
+                    binding.progressBar.show()
+                }
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    list = state.data.toMutableList()
+                    adapter.updateList(list)
+                }
+                is UiState.Failure -> {
+                    binding.progressBar.hide()
+                    toast(state.error)
+                }
+            }
+        }
+        viewModel.deleteNote.observe(viewLifecycleOwner){ state ->
+            when(state){
+                is UiState.Loading -> {
+                    binding.progressBar.show()
+                }
+                is UiState.Success -> {
+                    binding.progressBar.hide()
+                    toast(state.data)
+                    if(deletePosition != -1) {
+                        list.removeAt(deletePosition)
+                        adapter.updateList(list)
+                    }
+                }
+                is UiState.Failure -> {
+                    binding.progressBar.hide()
+                    toast(state.error)
+                }
+            }
         }
     }
 
-    fun setViews(state: UiState<List<Note>>) {
-        when(state){
-            is UiState.Loading -> {
-                binding.progressBar.show()
-            }
-            is UiState.Success -> {
-                binding.progressBar.hide()
-                adapter.updateList(state.data.toMutableList())
-            }
-            is UiState.Failure -> {
-                binding.progressBar.hide()
-                toast(state.error)
-            }
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
