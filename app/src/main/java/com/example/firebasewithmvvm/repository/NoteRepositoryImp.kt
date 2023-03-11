@@ -31,11 +31,17 @@ class NoteRepositoryImp(
     }
 
     override fun addNote(note: Note, result: (UiState<String>) -> Unit) {
-        database.collection(FirestoreTables.NOTE)
-            .add(note)
+
+        // "document()" Users'da yeni bir document oluşturur ve document'in referansını döndürür.
+        val document = database.collection(FirestoreTables.NOTE).document()
+        // note objesinin id'sine yeni oluşturulan document'in id'si verilir.
+        note.id = document.id
+
+        // bu yeni oluşturulan document'a note objesi set edilir.
+        document.set(note)
             .addOnSuccessListener {
                 result.invoke(
-                    UiState.Success(it.id)
+                    UiState.Success("Note has been created successfully!")
                 )
             }
             .addOnFailureListener {
