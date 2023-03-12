@@ -24,8 +24,10 @@ class NoteListingFragment : Fragment() {
 
     private var _binding: FragmentNoteListingBinding? = null
     private val binding get() = _binding!!
+
     val viewModel: NoteViewModel by viewModels()
     var deletePosition: Int = -1
+
     val adapter by lazy {
         NoteListingAdapter(
             onItemClicked = { pos, item ->

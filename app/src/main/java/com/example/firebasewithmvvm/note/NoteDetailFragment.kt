@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.firebasewithmvvm.R
 import com.example.firebasewithmvvm.databinding.FragmentNoteDetailBinding
 import com.example.firebasewithmvvm.model.Note
@@ -68,6 +69,7 @@ class NoteDetailFragment : Fragment() {
                     binding.btnProgressBar.hide()
                     binding.button2.text = "Create"
                     toast(state.data)
+                    //findNavController().navigateUp()
                 }
             }
         }

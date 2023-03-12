@@ -1,5 +1,10 @@
 package com.example.firebasewithmvvm.util
 
-object FirestoreTables{
+object FirestoreCollection{
     val NOTE = "note"
+    val USER = "user"
+}
+
+object FirestoreDocumentField {
+    val DATE = "date"
 }

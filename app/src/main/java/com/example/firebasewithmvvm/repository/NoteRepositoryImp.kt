@@ -1,7 +1,7 @@
 package com.example.firebasewithmvvm.repository
 
 import com.example.firebasewithmvvm.model.Note
-import com.example.firebasewithmvvm.util.FirestoreTables
+import com.example.firebasewithmvvm.util.FirestoreCollection
 import com.example.firebasewithmvvm.util.UiState
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -10,7 +10,7 @@ class NoteRepositoryImp(
 ): NoteRepository {
 
     override fun getNotes(result: (UiState<List<Note>>) -> Unit) {
-        database.collection(FirestoreTables.NOTE)
+        database.collection(FirestoreCollection.NOTE)
             .get()
             .addOnSuccessListener {
                 val notes = arrayListOf<Note>()
@@ -33,7 +33,7 @@ class NoteRepositoryImp(
     override fun addNote(note: Note, result: (UiState<String>) -> Unit) {
 
         // "document()" Users'da yeni bir document oluşturur ve document'in referansını döndürür.
-        val document = database.collection(FirestoreTables.NOTE).document()
+        val document = database.collection(FirestoreCollection.NOTE).document()
         // note objesinin id'sine yeni oluşturulan document'in id'si verilir.
         note.id = document.id
 
@@ -53,7 +53,7 @@ class NoteRepositoryImp(
 
     override fun updateNote(note: Note, result: (UiState<String>) -> Unit) {
         // update edeceğimiz document'in referansını aldık
-        val document = database.collection(FirestoreTables.NOTE).document(note.id)
+        val document = database.collection(FirestoreCollection.NOTE).document(note.id)
 
         document.set(note)
             .addOnSuccessListener {
@@ -69,7 +69,7 @@ class NoteRepositoryImp(
     }
 
     override fun deleteNote(note: Note, result: (UiState<String>) -> Unit) {
-        val document = database.collection(FirestoreTables.NOTE).document(note.id)
+        val document = database.collection(FirestoreCollection.NOTE).document(note.id)
         document.delete()
             .addOnSuccessListener {
                 result.invoke(
