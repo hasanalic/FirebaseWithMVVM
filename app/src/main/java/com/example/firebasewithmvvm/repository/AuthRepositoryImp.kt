@@ -14,8 +14,20 @@ class AuthRepositoryImp(
     val database: FirebaseFirestore
 ): AuthRepository {
 
-    override fun loginUser(user: User, result: (UiState<String>) -> Unit) {
-
+    override fun loginUser(email: String, password: String, result: (UiState<String>) -> Unit) {
+        auth.signInWithEmailAndPassword(email,password)
+            .addOnCompleteListener {
+                if(it.isSuccessful) {
+                    result.invoke(
+                        UiState.Success("Login Successfully.")
+                    )
+                }
+            }
+            .addOnFailureListener {
+                result.invoke(
+                    UiState.Failure("Authentication failed, check email and password.")
+                )
+            }
     }
 
     override fun registerUser(email: String, password: String, user: User, result: (UiState<String>) -> Unit) {
