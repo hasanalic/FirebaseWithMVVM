@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.firebasewithmvvm.R
 import com.example.firebasewithmvvm.databinding.FragmentNoteListingBinding
 import com.example.firebasewithmvvm.model.Note
@@ -25,7 +26,6 @@ class NoteListingFragment : Fragment() {
     private val binding get() = _binding!!
     val viewModel: NoteViewModel by viewModels()
     var deletePosition: Int = -1
-    var list: MutableList<Note> = arrayListOf()
     val adapter by lazy {
         NoteListingAdapter(
             onItemClicked = { pos, item ->
@@ -57,8 +57,10 @@ class NoteListingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // recyclerView adapter initialize
+        val staggeredGridLayoutManager = StaggeredGridLayoutManager(2,LinearLayoutManager.VERTICAL)
         binding.recyclerView.adapter = adapter
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
+        binding.recyclerView.layoutManager = staggeredGridLayoutManager
+        binding.recyclerView.itemAnimator = null
 
         // not ekleme ekranına gitme
         binding.button.setOnClickListener {
@@ -79,8 +81,7 @@ class NoteListingFragment : Fragment() {
                 }
                 is UiState.Success -> {
                     binding.progressBar.hide()
-                    list = state.data.toMutableList()
-                    adapter.updateList(list)
+                    adapter.updateList(state.data.toMutableList())
                 }
                 is UiState.Failure -> {
                     binding.progressBar.hide()
@@ -88,6 +89,7 @@ class NoteListingFragment : Fragment() {
                 }
             }
         }
+
         viewModel.deleteNote.observe(viewLifecycleOwner){ state ->
             when(state){
                 is UiState.Loading -> {
@@ -96,10 +98,26 @@ class NoteListingFragment : Fragment() {
                 is UiState.Success -> {
                     binding.progressBar.hide()
                     toast(state.data)
+                    adapter.removeItem(deletePosition)
+
+                    // ALTTAKİ İŞLEMDE;
+                    // notes'u observe ederken success alırsak UiState bize List<Note> döndürür.
+                    // bu List<Note>'u adapter'daki updateList fonksiyonuna veriyoruz.
+                    // ayrıca List<Note>'u, bu fragment'ta oluşturduğumuz "list"e atıyoruz.
+                    // Eğer silme işlemi olursa;
+                    // 1) elimizdeki "list" ten gerekli item silinir ve yeni liste adapter'daki updateList fonksiyonuna verilir.
+                    // fakat bu sadece bir item silmek için adapter'daki tüm list'i değiştirmeye neden olur yani verimsizdir.
+                    // 2) "notes"u observe ederken UiState'den aldığımız List<Notu>'u bu fragment'ta oluşturduğumuz "list"e atmak yerine
+                    // adapter'daki removeItem fonksiyonu çağırılıp silinmesi gereken item'ın pozisyonu verilebilir. Bu sayede adapter'daki list'te silme işlemi olur
+                    // yani tüm liste yenilenmez.
+                    // İkinci işlemin crash vermemesi için recyclerView'in "itemAnimator"üne null veriyoruz.
+
+                    /*
                     if(deletePosition != -1) {
                         list.removeAt(deletePosition)
                         adapter.updateList(list)
                     }
+                     */
                 }
                 is UiState.Failure -> {
                     binding.progressBar.hide()

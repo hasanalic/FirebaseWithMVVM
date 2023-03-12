@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.firebasewithmvvm.databinding.ItemNoteLayoutBinding
 import com.example.firebasewithmvvm.model.Note
+import java.text.SimpleDateFormat
 
 class NoteListingAdapter(
     val onItemClicked: (Int, Note) -> Unit,
@@ -12,10 +13,14 @@ class NoteListingAdapter(
     val onDeleteClicked: (Int, Note) -> Unit
 ): RecyclerView.Adapter<NoteListingAdapter.MyViewHolder>() {
 
+    // date convert process
+    val sdf = SimpleDateFormat("dd MMM yyyy")
+
     private var list: MutableList<Note> = arrayListOf()
 
     inner class MyViewHolder(val binding: ItemNoteLayoutBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Note) {
+            binding.noteId.text = sdf.format(item.date)
             binding.noteIdValue.text = item.id
             binding.msg.text = item.text
             binding.edit.setOnClickListener { onEditClicked.invoke(bindingAdapterPosition,item) }
